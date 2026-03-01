@@ -7,6 +7,8 @@ struct EbookReaderView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var showControls = false
   @State private var showSettings = false
+  @State private var showPlayerSheet = false
+  @ObservedObject private var playerManager = PlayerManager.shared
 
   var body: some View {
     ZStack {
@@ -67,6 +69,11 @@ struct EbookReaderView: View {
     }
     .sheet(item: $model.search) { searchModel in
       EbookSearchView(model: searchModel)
+    }
+    .adaptiveSheet(isPresented: $showPlayerSheet) {
+      if let player = playerManager.current {
+        EbookPlayerSheet(player: player)
+      }
     }
     .onAppear(perform: model.onAppear)
     .onDisappear(perform: model.onDisappear)
@@ -175,6 +182,18 @@ struct EbookReaderView: View {
         }
       }
       .frame(maxWidth: .infinity)
+
+      if playerManager.current != nil {
+        Button(action: { showPlayerSheet = true }) {
+          VStack(spacing: 6) {
+            Image(systemName: "playpause.circle")
+              .font(.system(size: 20))
+            Text("Now Playing")
+              .font(.caption2)
+          }
+        }
+        .frame(maxWidth: .infinity)
+      }
     }
     .padding(.vertical, 8)
   }
