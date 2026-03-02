@@ -144,9 +144,13 @@ final class TimerPickerSheetViewModel: TimerPickerSheet.Model {
     let adjustedSeconds = totalSeconds / playbackSpeed
 
     let endDate = Date().addingTimeInterval(adjustedSeconds)
-    let formatter = DateFormatter()
-    formatter.dateFormat = "h:mm a"
-    estimatedEndTime = "Pauses at \(formatter.string(from: endDate))"
+
+    let time = endDate.formatted(date: .omitted, time: .shortened)
+
+    estimatedEndTime = String(
+      format: String(localized: "pauses_at", defaultValue: "Pauses at %@"),
+      time
+    )
   }
 
   override func onOffSelected() {

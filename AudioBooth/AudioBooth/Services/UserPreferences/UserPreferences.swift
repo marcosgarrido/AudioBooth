@@ -383,7 +383,7 @@ enum ColorSchemeMode: String, CaseIterable {
   case light
   case dark
 
-  var displayText: String {
+  var displayText: LocalizedStringResource {
     switch self {
     case .auto: "Auto"
     case .light: "Light"
@@ -407,11 +407,11 @@ enum ContinueSectionSize: Int, CaseIterable {
 
   var value: CGFloat { CGFloat(rawValue) }
 
-  var displayText: String {
+  var displayText: LocalizedStringResource {
     switch self {
-    case .default: "Default"
-    case .large: "Large"
-    case .extraLarge: "Extra Large"
+    case .default: "size_default"
+    case .large: "size_large"
+    case .extraLarge: "size_extra_large"
     }
   }
 }

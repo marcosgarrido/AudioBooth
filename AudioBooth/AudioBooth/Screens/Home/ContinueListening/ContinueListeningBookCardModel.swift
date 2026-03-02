@@ -21,10 +21,7 @@ final class ContinueListeningBookCardModel: BookCard.Model {
   }
 
   init(book: Book, onRemoved: @escaping () -> Void) {
-    let timeRemaining =
-      Duration.seconds(book.duration)
-      .formatted(.units(allowed: [.hours, .minutes], width: .narrow))
-      + " remaining"
+    let timeRemaining = book.duration.formatTimeRemaining()
 
     self.item = .remote(book)
 
@@ -51,10 +48,7 @@ final class ContinueListeningBookCardModel: BookCard.Model {
   }
 
   init(localBook: LocalBook, onRemoved: @escaping () -> Void) {
-    let timeRemaining =
-      Duration.seconds(localBook.duration)
-      .formatted(.units(allowed: [.hours, .minutes], width: .narrow))
-      + " remaining"
+    let timeRemaining = localBook.duration.formatTimeRemaining()
 
     self.item = .local(localBook)
 
@@ -81,10 +75,7 @@ final class ContinueListeningBookCardModel: BookCard.Model {
   }
 
   init(localEpisode episode: LocalEpisode) {
-    let timeRemaining =
-      Duration.seconds(episode.duration)
-      .formatted(.units(allowed: [.hours, .minutes], width: .narrow))
-      + " remaining"
+    let timeRemaining = episode.duration.formatTimeRemaining()
 
     self.item = .localEpisode(episode)
 
@@ -142,15 +133,9 @@ extension ContinueListeningBookCardModel {
         if let current = PlayerManager.shared.current,
           [id].contains(current.id)
         {
-          details =
-            Duration.seconds(current.playbackProgress.totalTimeRemaining)
-            .formatted(.units(allowed: [.hours, .minutes], width: .narrow))
-            + " remaining"
+          details = current.playbackProgress.totalTimeRemaining.formatTimeRemaining()
         } else {
-          details =
-            Duration.seconds(remainingTime)
-            .formatted(.units(allowed: [.hours, .minutes], width: .narrow))
-            + " remaining"
+          details = remainingTime.formatTimeRemaining()
         }
       }
     }
