@@ -7,9 +7,7 @@ import Nuke
 final class CarPlayOffline {
   private let interfaceController: CPInterfaceController
   private weak var nowPlaying: CarPlayNowPlaying?
-  private var currentPlayerCancellable: AnyCancellable?
   private let downloadManager = DownloadManager.shared
-  private var booksObservation: Task<Void, Never>?
 
   let template: CPListTemplate
 
@@ -22,28 +20,15 @@ final class CarPlayOffline {
     template.tabTitle = title
     template.tabImage = UIImage(systemName: "arrow.down.circle.fill")
 
-    currentPlayerCancellable = PlayerManager.shared.$current.sink { [weak self] _ in
-      Task {
-        await self?.loadBooks()
-      }
-    }
-    
-    setupBooksObservation()
-
     Task {
       await loadBooks()
     }
   }
   
-  private func setupBooksObservation() {
-    booksObservation = Task { [weak self] in
-      for await _ in LocalBook.observeAll() {
-        guard !Task.isCancelled, let self else { break }
-        await self.loadBooks()
-      }
-    }
+  func reload() async {
+    await loadBooks()
   }
-
+  
   private func loadBooks() async {
     let items = await buildBookItems()
     if items.isEmpty {
@@ -108,7 +93,6 @@ final class CarPlayOffline {
     Task {
       PlayerManager.shared.setCurrent(book)
       try? await Task.sleep(for: .milliseconds(500))
-      PlayerManager.shared.play()
       nowPlaying?.showNowPlaying()
       completion()
     }
