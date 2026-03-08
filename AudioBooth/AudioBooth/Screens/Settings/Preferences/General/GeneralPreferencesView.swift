@@ -6,6 +6,14 @@ struct GeneralPreferencesView: View {
 
   var body: some View {
     Form {
+      Section {
+        Toggle(isOn: $preferences.openPlayerOnLaunch) {
+          Text("Open Player on Launch")
+            .font(.subheadline)
+            .bold()
+        }
+      }
+
       Section("Appearance") {
         NavigationLink {
           AppIconPickerView(model: iconModel)

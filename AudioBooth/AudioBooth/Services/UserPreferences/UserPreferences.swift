@@ -139,6 +139,9 @@ final class UserPreferences: ObservableObject {
   @AppStorage("authorsSortAscending")
   var authorsSortAscending: Bool = true
 
+  @AppStorage("openPlayerOnLaunch")
+  var openPlayerOnLaunch: Bool = false
+
   let cloud = NSUbiquitousKeyValueStore.default
   var cloudObserver: NSObjectProtocol?
   var localObserver: NSObjectProtocol?

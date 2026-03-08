@@ -6,8 +6,10 @@ import SwiftUI
 struct ContentView: View {
   @StateObject private var playerManager = PlayerManager.shared
   @ObservedObject private var libraries = Audiobookshelf.shared.libraries
+  @ObservedObject private var preferences = UserPreferences.shared
 
   @Environment(\.colorScheme) private var colorScheme
+  @Environment(\.scenePhase) private var scenePhase
 
   @State private var isKeyboardVisible = false
   @State private var selectedTab: TabSelection = .home
@@ -76,6 +78,11 @@ struct ContentView: View {
         isKeyboardVisible = false
       }
       .handleDeepLinks()
+      .onChange(of: scenePhase) { _, newPhase in
+        if newPhase == .active, preferences.openPlayerOnLaunch, playerManager.current != nil {
+          playerManager.showFullPlayer()
+        }
+      }
   }
 
   @ViewBuilder
