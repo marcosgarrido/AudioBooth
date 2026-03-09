@@ -4,7 +4,7 @@ import Foundation
 import Models
 import Nuke
 
-final class CarPlayOffline {
+final class CarPlayOffline: CarPlayPageProtocol {
   private let interfaceController: CPInterfaceController
   private weak var nowPlaying: CarPlayNowPlaying?
   private var currentPlayerCancellable: AnyCancellable?
@@ -30,6 +30,10 @@ final class CarPlayOffline {
     Task {
       await loadBooks()
     }
+  }
+
+  func willAppear() {
+    Task { await loadBooks() }
   }
 
   private func loadBooks() async {
@@ -95,9 +99,8 @@ final class CarPlayOffline {
 
     Task {
       PlayerManager.shared.setCurrent(book)
-
       try? await Task.sleep(for: .milliseconds(500))
-
+      PlayerManager.shared.play()
       nowPlaying?.showNowPlaying()
       completion()
     }

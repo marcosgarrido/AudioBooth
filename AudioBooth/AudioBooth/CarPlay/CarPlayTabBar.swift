@@ -3,10 +3,9 @@ import API
 import Combine
 import Foundation
 
-final class CarPlayTabBar {
+final class CarPlayTabBar: NSObject {
   private let interfaceController: CPInterfaceController
-  private var home: CarPlayHome?
-  private var offline: CarPlayOffline?
+  private var tabs: [CPTemplate: CarPlayPageProtocol] = [:]
   private weak var nowPlaying: CarPlayNowPlaying?
   private var cancellables = Set<AnyCancellable>()
 
@@ -17,6 +16,10 @@ final class CarPlayTabBar {
     self.nowPlaying = nowPlaying
 
     self.template = Self.emptyTemplate
+
+    super.init()
+
+    interfaceController.delegate = self
 
     Audiobookshelf.shared.libraries.objectWillChange
       .receive(on: RunLoop.main)
@@ -41,18 +44,22 @@ final class CarPlayTabBar {
     let newTemplate: CPTemplate
 
     if Audiobookshelf.shared.authentication.server != nil, Audiobookshelf.shared.libraries.current != nil {
-      let homeInstance = CarPlayHome(interfaceController: interfaceController, nowPlaying: nowPlaying)
-      let offlineInstance = CarPlayOffline(interfaceController: interfaceController, nowPlaying: nowPlaying)
-      home = homeInstance
-      offline = offlineInstance
-      newTemplate = CPTabBarTemplate(templates: [homeInstance.template, offlineInstance.template])
+      let home = CarPlayHome(interfaceController: interfaceController, nowPlaying: nowPlaying)
+      let offline = CarPlayOffline(interfaceController: interfaceController, nowPlaying: nowPlaying)
+      tabs = [home.template: home, offline.template: offline]
+      newTemplate = CPTabBarTemplate(templates: [home.template, offline.template])
     } else {
-      home = nil
-      offline = nil
+      tabs = [:]
       newTemplate = Self.emptyTemplate
     }
 
     template = newTemplate
     interfaceController.setRootTemplate(newTemplate, animated: false, completion: nil)
+  }
+}
+
+extension CarPlayTabBar: CPInterfaceControllerDelegate {
+  func templateWillAppear(_ template: CPTemplate, animated: Bool) {
+    tabs[template]?.willAppear()
   }
 }
